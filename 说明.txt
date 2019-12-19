@@ -1,0 +1,13 @@
+ES 学习
+SpringBoot整合Elasticsearch并实现CRUD操作
+https://blog.csdn.net/zxc123e/article/details/79498113
+
+SpringBoot集成ElasticSearch
+https://www.jianshu.com/p/6887faf6b479
+
+docker简易搭建ElasticSearch集群
+https://blog.csdn.net/belonghuang157405/article/details/83301937
+
+Java API
+https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/index.html
+
