@@ -36,7 +36,6 @@ public class BlogController {
     @Autowired
     TransportClient client;
 
-
     @ApiOperation(value = "根据参数添加博客", notes = "根据参数添加博客")
     @PostMapping(value = "/add")
     public ResponseEntity add(@RequestBody Blog blog) {
