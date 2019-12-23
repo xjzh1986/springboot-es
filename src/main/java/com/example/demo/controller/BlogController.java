@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -40,14 +41,27 @@ public class BlogController {
     @PostMapping(value = "/add")
     public ResponseEntity add(@RequestBody Blog blog) {
         try {
+            IndexResponse result = null;
+            //批量添加
+//            for(int i=0;i<1000;i++){
+//                XContentBuilder content = XContentFactory.jsonBuilder().startObject()
+//                        .field("title", "title"+i)
+//                        .field("author", "Authro"+i)
+//                        .field("word_count", (int)(Math.random()*(9999-1000+1)+1000))
+//                        .field("publish_date", new Date().getTime())
+//                        .endObject();
+//
+//                result = this.client.prepareIndex("book", "novel").setSource(content).get();
+//            }
             XContentBuilder content = XContentFactory.jsonBuilder().startObject()
                     .field("title", blog.getTitle())
                     .field("author", blog.getAuthro())
                     .field("word_count", blog.getWordount())
-                    .field("publish_date", blog.getPublishDate().getTime())
+                    .field("publish_date", blog.getPublishDate())
                     .endObject();
 
-            IndexResponse result = this.client.prepareIndex("book", "novel").setSource(content).get();
+            result = this.client.prepareIndex("book", "novel").setSource(content).get();
+
             return new ResponseEntity(result.getId(), HttpStatus.OK);
 
         } catch (IOException e) {
