@@ -19,6 +19,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,35 +33,35 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/blog")
-@Api(tags = "博客模块")
+@Api(tags = "书目模块")
 public class BlogController {
     @Autowired
     TransportClient client;
 
-    @ApiOperation(value = "根据参数添加博客", notes = "根据参数添加博客")
+    @ApiOperation(value = "根据参数添加书目", notes = "根据参数添加书目")
     @PostMapping(value = "/add")
     public ResponseEntity add(@RequestBody Blog blog) {
         try {
             IndexResponse result = null;
             //批量添加
-//            for(int i=0;i<1000;i++){
-//                XContentBuilder content = XContentFactory.jsonBuilder().startObject()
-//                        .field("title", "title"+i)
-//                        .field("author", "Authro"+i)
-//                        .field("word_count", (int)(Math.random()*(9999-1000+1)+1000))
-//                        .field("publish_date", new Date().getTime())
-//                        .endObject();
-//
-//                result = this.client.prepareIndex("book", "novel").setSource(content).get();
-//            }
-            XContentBuilder content = XContentFactory.jsonBuilder().startObject()
-                    .field("title", blog.getTitle())
-                    .field("author", blog.getAuthro())
-                    .field("word_count", blog.getWordount())
-                    .field("publish_date", blog.getPublishDate().getTime())
-                    .endObject();
+            for(int i=0;i<5000;i++){
+                XContentBuilder content = XContentFactory.jsonBuilder().startObject()
+                        .field("title", "title"+i)
+                        .field("author", "Authro"+i)
+                        .field("word_count", (int)(Math.random()*(9999-1000+1)+1000))
+                        .field("publish_date", new Date().getTime())
+                        .endObject();
 
-            result = this.client.prepareIndex("book", "novel").setSource(content).get();
+                result = this.client.prepareIndex("book", "novel").setSource(content).get();
+            }
+//            XContentBuilder content = XContentFactory.jsonBuilder().startObject()
+//                    .field("title", blog.getTitle())
+//                    .field("author", blog.getAuthro())
+//                    .field("word_count", blog.getWordount())
+//                    .field("publish_date", blog.getPublishDate().getTime())
+//                    .endObject();
+//
+//            result = this.client.prepareIndex("book", "novel").setSource(content).get();
 
             return new ResponseEntity(result.getId(), HttpStatus.OK);
 
@@ -70,7 +71,7 @@ public class BlogController {
         }
     }
 
-    @ApiOperation(value = "根据id删除博客", notes = "根据id删除博客")
+    @ApiOperation(value = "根据id删除书目", notes = "根据id删除书目")
     @DeleteMapping(value = "/deleteById")
     public ResponseEntity deleteById(@RequestParam(name = "id") String id)
     {
@@ -78,7 +79,7 @@ public class BlogController {
         return new ResponseEntity(result.getResult().toString(), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "根据id查找博客", notes = "根据id查找博客")
+    @ApiOperation(value = "根据id查找书目", notes = "根据id查找书目")
     @GetMapping(value = "/getById")
     public ResponseEntity getById(@RequestParam(name = "id", defaultValue="") String id)
     {
@@ -91,7 +92,7 @@ public class BlogController {
         }
         return new ResponseEntity(result.getSource(), HttpStatus.OK);
     }
-    @ApiOperation(value = "根据id更新博客", notes = "根据id更新博客")
+    @ApiOperation(value = "根据id更新书目", notes = "根据id更新书目")
     @PutMapping("/updatebyId")
     public ResponseEntity updatebyId(@RequestBody Blog blog,@RequestParam(name = "id") String id){
         try {
@@ -116,7 +117,7 @@ public class BlogController {
     }
 
     @GetMapping("/queryByParam")
-    @ApiOperation(value = "根据id更新博客", notes = "根据id更新博客")
+    @ApiOperation(value = "根据条件查询书目", notes = "根据条件查询书目")
     @PostMapping("/queryByParam")
     public ResponseEntity queryByParam(@RequestParam(name = "author", required = false) String author,
                                 @RequestParam(name = "title", required = false) String title,
@@ -143,14 +144,17 @@ public class BlogController {
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(boolQueryBuilder)
                 .setFrom(0)
-                .setSize(10);
+                .setSize(10)
+                .addSort("publish_date", SortOrder.DESC);
         System.out.println(searchRequestBuilder); //调试用
         SearchResponse response = searchRequestBuilder.get();
         List<Map<String, Object>> result = new ArrayList<>();
         for (SearchHit hit : response.getHits()){
-            result.add(hit.getSourceAsMap());
+            String tt = hit.getId();
+            Map<String, Object> map = hit.getSourceAsMap();
+            map.put("id",hit.getId());
+            result.add(map);
         }
-
         return  new ResponseEntity(result, HttpStatus.OK);
     }
 }

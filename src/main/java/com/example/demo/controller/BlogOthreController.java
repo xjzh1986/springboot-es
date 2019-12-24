@@ -4,42 +4,31 @@ package com.example.demo.controller;
 import com.example.demo.entity.Blog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.reindex.BulkByScrollResponse;
-import org.elasticsearch.index.reindex.DeleteByQueryAction;
-import org.elasticsearch.index.reindex.DeleteByQueryRequestBuilder;
-import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.index.reindex.*;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/blogOther")
-@Api(tags = "博客其他模块")
+@Api(tags = "书目其他模块")
 public class BlogOthreController {
     @Autowired
     TransportClient client;
 
-    @ApiOperation(value = "根据条件删除博客", notes = "根据条件删除博客")
+    @ApiOperation(value = "根据条件删除书目", notes = "根据条件删除书目")
     @PostMapping(value = "/delByTitleAndAut")
     public ResponseEntity delByTitleAndAut(@RequestBody Blog blog) {
         try {
@@ -57,7 +46,7 @@ public class BlogOthreController {
         }
     }
 
-    @ApiOperation(value = "根据条件模糊匹配删除博客", notes = "根据条件模糊匹配删除博客")
+    @ApiOperation(value = "根据条件模糊匹配删除书目", notes = "根据条件模糊匹配删除书目")
     @PostMapping(value = "/delLikeByTitle")
     public ResponseEntity delLikeByTitle(@RequestBody Blog blog) {
         try {
@@ -68,6 +57,44 @@ public class BlogOthreController {
                             .get();
             long deleted = response.getDeleted();
             return new ResponseEntity(deleted, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @ApiOperation(value = "根据条件匹配更新书目", notes = "根据条件匹配更新书目")
+    @PostMapping(value = "/modifyByTitle")
+    public ResponseEntity modifyByTitle1(@RequestBody Blog blog) {
+        try {
+            UpdateByQueryRequestBuilder updateByQueryRequestBuilder = UpdateByQueryAction.INSTANCE.newRequestBuilder(client);
+            updateByQueryRequestBuilder.source("book");
+            updateByQueryRequestBuilder.filter(QueryBuilders.termQuery("title", blog.getTitle()));
+            updateByQueryRequestBuilder.script(
+                    new Script("ctx._source.author="+blog.getAuthro()
+                            +";ctx._source.word_count="+blog.getWordount()
+                            +";"));
+            long count =updateByQueryRequestBuilder.get().getUpdated();
+            return new ResponseEntity(count, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @ApiOperation(value = "根据条件模糊匹配更新书目", notes = "根据条件模糊匹配更新书目")
+    @PostMapping(value = "/modifyLikeByTitle")
+    public ResponseEntity modifyLikeByTitle1(@RequestBody Blog blog) {
+        try {
+            UpdateByQueryRequestBuilder updateByQueryRequestBuilder = UpdateByQueryAction.INSTANCE.newRequestBuilder(client);
+            updateByQueryRequestBuilder.source("book");
+            updateByQueryRequestBuilder.filter(QueryBuilders.wildcardQuery("title", "*"+blog.getTitle()+"*"));
+            updateByQueryRequestBuilder.script(
+                    new Script("ctx._source.author="+blog.getAuthro()
+                            +";ctx._source.word_count="+blog.getWordount()
+                            +";"));
+            long count =updateByQueryRequestBuilder.get().getUpdated();
+            return new ResponseEntity(count, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);

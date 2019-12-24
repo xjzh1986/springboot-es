@@ -9,7 +9,7 @@ public class Blog implements Serializable {
 
     private String authro;
 
-    private String wordount;
+    private int wordount;
 
     private Date publishDate;
 
@@ -29,11 +29,11 @@ public class Blog implements Serializable {
         this.authro = authro;
     }
 
-    public String getWordount() {
+    public int getWordount() {
         return wordount;
     }
 
-    public void setWordount(String wordount) {
+    public void setWordount(int wordount) {
         this.wordount = wordount;
     }
 
