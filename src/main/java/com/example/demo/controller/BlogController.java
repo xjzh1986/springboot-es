@@ -57,7 +57,7 @@ public class BlogController {
                     .field("title", blog.getTitle())
                     .field("author", blog.getAuthro())
                     .field("word_count", blog.getWordount())
-                    .field("publish_date", blog.getPublishDate())
+                    .field("publish_date", blog.getPublishDate().getTime())
                     .endObject();
 
             result = this.client.prepareIndex("book", "novel").setSource(content).get();
