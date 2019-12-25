@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 
 import com.example.demo.entity.Blog;
+import com.example.demo.utils.DateLogUtils;
 import com.example.demo.utils.DateUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,8 +50,7 @@ public class BlogController {
 
         try {
             IndexResponse result = null;
-            Date startDate = new Date();
-            System.out.println("开始时间"+DateUtils.dateToStr(startDate));
+            Date startDate = DateLogUtils.startDateLog();
             //批量添加
             int num = 0;
             for(int i=0;i<50000000;i++){
@@ -86,9 +86,7 @@ public class BlogController {
 //                    .endObject();
 //
 //            result = this.client.prepareIndex("book", "novel").setSource(content).get();
-            Date endDate = new Date();
-            System.out.println("结束时间"+DateUtils.dateToStr(endDate));
-            System.out.println(DateUtils.getDistanceTime(startDate,endDate));
+            DateLogUtils.endDateLog(startDate);
             return new ResponseEntity(result.getId(), HttpStatus.OK);
 
         } catch (IOException e) {
@@ -191,8 +189,10 @@ public class BlogController {
     public ResponseEntity queryPageByParam(@RequestParam(name = "author", required = false) String author,
                                        @RequestParam(name = "title", required = false) String title,
                                        @RequestParam(name = "gt_word_count", defaultValue = "0") int gtWordCount,
-                                       @RequestParam(name = "lt_word_count", required = false) Integer ltWordCount)
-    {
+                                       @RequestParam(name = "lt_word_count", required = false) Integer ltWordCount){
+
+        Date startDate = DateLogUtils.startDateLog();
+
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (author != null){
             boolQueryBuilder.must(QueryBuilders.matchQuery("author",author));
@@ -204,16 +204,17 @@ public class BlogController {
         RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("word_count").from(gtWordCount);
         if (ltWordCount != null && ltWordCount > 0){
             rangeQueryBuilder.to(ltWordCount);
+            boolQueryBuilder.filter(rangeQueryBuilder);
         }
 
-        boolQueryBuilder.filter(rangeQueryBuilder);
+
 
         SearchRequestBuilder searchRequestBuilder = this.client.prepareSearch("book")
                 .setTypes("novel")
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(boolQueryBuilder)
-                .setFrom(10)
-                .setSize(20)
+                .setFrom(0)
+                .setSize(10)
                 .addSort("publish_date", SortOrder.DESC);
 
         SearchResponse response = searchRequestBuilder.get();
@@ -228,12 +229,10 @@ public class BlogController {
         long searchRequestBuilderTotal = this.client.prepareSearch("book")
                 .setTypes("novel")
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .setQuery(boolQueryBuilder)
-                .setFrom(10)
-                .setSize(20)
-                .addSort("publish_date", SortOrder.DESC).get().getHits().getTotalHits();
+                .setQuery(boolQueryBuilder).get().getHits().getTotalHits();
+        System.out.println("searchRequestBuilderTotal" + searchRequestBuilderTotal);
 
-
+        DateLogUtils.endDateLog(startDate);
         return  new ResponseEntity(result, HttpStatus.OK);
     }
 
