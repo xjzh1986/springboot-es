@@ -77,7 +77,7 @@ public class BlogOthreController {
             updateByQueryRequestBuilder.filter(QueryBuilders.termQuery("title", blog.getTitle()));
             updateByQueryRequestBuilder.script(
                     new Script("ctx._source.author="+blog.getAuthro()
-                            +";ctx._source.word_count="+blog.getWordount()
+                            +";ctx._source.word_count="+blog.getWordCount()
                             +";"));
             long count =updateByQueryRequestBuilder.get().getUpdated();
             return new ResponseEntity(count, HttpStatus.OK);
@@ -96,7 +96,7 @@ public class BlogOthreController {
             updateByQueryRequestBuilder.filter(QueryBuilders.wildcardQuery("title", "*"+blog.getTitle()+"*"));
             updateByQueryRequestBuilder.script(
                     new Script("ctx._source.author="+blog.getAuthro()
-                            +";ctx._source.word_count="+blog.getWordount()
+                            +";ctx._source.word_count="+blog.getWordCount()
                             +";"));
             long count =updateByQueryRequestBuilder.get().getUpdated();
             return new ResponseEntity(count, HttpStatus.OK);

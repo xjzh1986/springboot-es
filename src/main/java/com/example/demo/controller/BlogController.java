@@ -5,6 +5,7 @@ import com.example.demo.entity.Blog;
 import com.example.demo.utils.DateUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -27,10 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping(value = "/blog")
@@ -42,17 +40,40 @@ public class BlogController {
     @ApiOperation(value = "根据参数添加书目", notes = "根据参数添加书目")
     @PostMapping(value = "/add")
     public ResponseEntity add(@RequestBody Blog blog) {
+
+        String[] types = new String[4];
+        types[0] = "technology";
+        types[1] = "humanity";
+        types[2] = "heart";
+        types[3] = "chemical";
+
         try {
             IndexResponse result = null;
             Date startDate = new Date();
             System.out.println("开始时间"+DateUtils.dateToStr(startDate));
             //批量添加
+            int num = 0;
             for(int i=0;i<50000000;i++){
+
+                if(num < 2){
+                    num++;
+                }else{
+                    num = 0;
+                }
+
+                String code = UUID.randomUUID().toString().replace("-","");
                 XContentBuilder content = XContentFactory.jsonBuilder().startObject()
-                        .field("title", "title-1225"+i)
-                        .field("author", "Authro-1225"+i)
-                        .field("word_count", (int)(Math.random()*(9999-1000+1)+1000))
-                        .field("publish_date", new Date().getTime())
+                        .field("title", "title"+i)
+                        .field("author", "author"+i)
+                        .field("wordCount", (int)(Math.random()*(9999-1000+1)+1000))
+                        .field("publishDate", new Date().getTime())
+                        .field("createDate", new Date().getTime())
+                        .field("updateDate", new Date().getTime())
+                        .field("createCode", code)
+                        .field("updateCode", code)
+                        .field("content", "经常在添加数据到数据库中使用")
+                        .field("frontImage", "https://blog.csdn.net/zhengyikuangge/article/details/"+i)
+                        .field("type", types[num])
                         .endObject();
                 System.out.println("成功插入 第 " + i + " 条");
                 result = this.client.prepareIndex("book", "novel").setSource(content).get();
@@ -132,23 +153,26 @@ public class BlogController {
         if (author != null){
             boolQueryBuilder.must(QueryBuilders.matchQuery("author",author));
         }
+
         if (title != null){
-            boolQueryBuilder.must(QueryBuilders.matchQuery("title", title));
+//            String titleTemp = "title+-&&||!(){}[]^\"~*?:\\";
+            title = QueryParser.escape(title);
+            boolQueryBuilder.must(QueryBuilders.termQuery("title", title));
         }
 
         RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("word_count").from(gtWordCount);
         if (ltWordCount != null && ltWordCount > 0){
             rangeQueryBuilder.to(ltWordCount);
+            boolQueryBuilder.filter(rangeQueryBuilder);
         }
 
-        boolQueryBuilder.filter(rangeQueryBuilder);
 
-        SearchRequestBuilder searchRequestBuilder = this.client.prepareSearch("book")
+        SearchRequestBuilder searchRequestBuilder = client.prepareSearch("book")
                 .setTypes("novel")
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(boolQueryBuilder)
-                .setFrom(10)
-                .setSize(20)
+                .setFrom(0)
+                .setSize(10)
                 .addSort("publish_date", SortOrder.DESC);
         System.out.println(searchRequestBuilder); //调试用
         SearchResponse response = searchRequestBuilder.get();

@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 public class DateUtils {
 	
@@ -119,8 +120,13 @@ public class DateUtils {
 
 
 	public static void main(String[] args){
-		System.out.println(strToDate("2019-12-25 10:00:00"));
-		System.out.println(getDistanceTime(strToDate("2019-12-25 10:00:00"),strToDate("2019-12-30 9:8:6")));
+//		System.out.println(strToDate("2019-12-25 10:00:00"));
+//		System.out.println(getDistanceTime(strToDate("2019-12-25 10:00:00"),strToDate("2019-12-30 9:8:6")));
+
+		String code = UUID.randomUUID().toString().replace("-","");
+		System.out.println(code);
+
+
 	}
 
 }
