@@ -22,6 +22,8 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -140,100 +142,6 @@ public class BlogController {
         }
     }
 
-    @ApiOperation(value = "根据条件查询书目", notes = "根据条件查询书目")
-    @PostMapping("/queryByParam")
-    public ResponseEntity queryByParam(@RequestParam(name = "author", required = false) String author,
-                                @RequestParam(name = "title", required = false) String title,
-                                @RequestParam(name = "gt_word_count", defaultValue = "0") int gtWordCount,
-                                @RequestParam(name = "lt_word_count", required = false) Integer ltWordCount)
-    {
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        if (author != null){
-            boolQueryBuilder.must(QueryBuilders.matchQuery("author",author));
-        }
 
-        if (title != null){
-//            String titleTemp = "title+-&&||!(){}[]^\"~*?:\\";
-            title = QueryParser.escape(title);
-            boolQueryBuilder.must(QueryBuilders.termQuery("title", title));
-        }
-
-        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("word_count").from(gtWordCount);
-        if (ltWordCount != null && ltWordCount > 0){
-            rangeQueryBuilder.to(ltWordCount);
-            boolQueryBuilder.filter(rangeQueryBuilder);
-        }
-
-
-        SearchRequestBuilder searchRequestBuilder = client.prepareSearch("book")
-                .setTypes("novel")
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .setQuery(boolQueryBuilder)
-                .setFrom(0)
-                .setSize(10)
-                .addSort("publish_date", SortOrder.DESC);
-        System.out.println(searchRequestBuilder); //调试用
-        SearchResponse response = searchRequestBuilder.get();
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (SearchHit hit : response.getHits()){
-            String tt = hit.getId();
-            Map<String, Object> map = hit.getSourceAsMap();
-            map.put("id",hit.getId());
-            result.add(map);
-        }
-        return  new ResponseEntity(result, HttpStatus.OK);
-    }
-
-    @ApiOperation(value = "根据条件分页查询书目", notes = "根据条件分页查询书目")
-    @PostMapping("/queryPageByParam")
-    public ResponseEntity queryPageByParam(@RequestParam(name = "author", required = false) String author,
-                                       @RequestParam(name = "title", required = false) String title,
-                                       @RequestParam(name = "gt_word_count", defaultValue = "0") int gtWordCount,
-                                       @RequestParam(name = "lt_word_count", required = false) Integer ltWordCount){
-
-        Date startDate = DateLogUtils.startDateLog();
-
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        if (author != null){
-            boolQueryBuilder.must(QueryBuilders.matchQuery("author",author));
-        }
-        if (title != null){
-            boolQueryBuilder.must(QueryBuilders.matchQuery("title", title));
-        }
-
-        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("word_count").from(gtWordCount);
-        if (ltWordCount != null && ltWordCount > 0){
-            rangeQueryBuilder.to(ltWordCount);
-            boolQueryBuilder.filter(rangeQueryBuilder);
-        }
-
-
-
-        SearchRequestBuilder searchRequestBuilder = this.client.prepareSearch("book")
-                .setTypes("novel")
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .setQuery(boolQueryBuilder)
-                .setFrom(0)
-                .setSize(10)
-                .addSort("publish_date", SortOrder.DESC);
-
-        SearchResponse response = searchRequestBuilder.get();
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (SearchHit hit : response.getHits()){
-            String tt = hit.getId();
-            Map<String, Object> map = hit.getSourceAsMap();
-            map.put("id",hit.getId());
-            result.add(map);
-        }
-
-        long searchRequestBuilderTotal = this.client.prepareSearch("book")
-                .setTypes("novel")
-                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .setQuery(boolQueryBuilder).get().getHits().getTotalHits();
-        System.out.println("searchRequestBuilderTotal" + searchRequestBuilderTotal);
-
-        DateLogUtils.endDateLog(startDate);
-        return  new ResponseEntity(result, HttpStatus.OK);
-    }
 
 }

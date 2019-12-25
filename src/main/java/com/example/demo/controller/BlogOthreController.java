@@ -8,11 +8,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.*;
 import org.elasticsearch.script.Script;
-import org.elasticsearch.script.ScriptType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,15 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
-
 @RestController
 @RequestMapping(value = "/blogOther")
-@Api(tags = "书目其他模块")
+@Api(tags = "书目参数匹配模块")
 public class BlogOthreController {
     @Autowired
     TransportClient client;
@@ -100,18 +90,6 @@ public class BlogOthreController {
                             +";"));
             long count =updateByQueryRequestBuilder.get().getUpdated();
             return new ResponseEntity(count, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @ApiOperation(value = "分页查询", notes = "分页查询")
-    @PostMapping(value = "/queryByPage")
-    public ResponseEntity queryByPage(@RequestBody Blog blog) {
-        try {
-
-            return new ResponseEntity(0, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
