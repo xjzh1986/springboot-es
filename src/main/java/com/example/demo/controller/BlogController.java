@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 
 import com.example.demo.entity.Blog;
+import com.example.demo.utils.DateUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -43,15 +44,17 @@ public class BlogController {
     public ResponseEntity add(@RequestBody Blog blog) {
         try {
             IndexResponse result = null;
+            Date startDate = new Date();
+            System.out.println("开始时间"+DateUtils.dateToStr(startDate));
             //批量添加
-            for(int i=0;i<5000;i++){
+            for(int i=0;i<50000000;i++){
                 XContentBuilder content = XContentFactory.jsonBuilder().startObject()
-                        .field("title", "title"+i)
-                        .field("author", "Authro"+i)
+                        .field("title", "title-1225"+i)
+                        .field("author", "Authro-1225"+i)
                         .field("word_count", (int)(Math.random()*(9999-1000+1)+1000))
                         .field("publish_date", new Date().getTime())
                         .endObject();
-
+                System.out.println("成功插入 第 " + i + " 条");
                 result = this.client.prepareIndex("book", "novel").setSource(content).get();
             }
 //            XContentBuilder content = XContentFactory.jsonBuilder().startObject()
@@ -62,7 +65,9 @@ public class BlogController {
 //                    .endObject();
 //
 //            result = this.client.prepareIndex("book", "novel").setSource(content).get();
-
+            Date endDate = new Date();
+            System.out.println("结束时间"+DateUtils.dateToStr(endDate));
+            System.out.println(DateUtils.getDistanceTime(startDate,endDate));
             return new ResponseEntity(result.getId(), HttpStatus.OK);
 
         } catch (IOException e) {
