@@ -1,7 +1,8 @@
 package com.example.demo.controller;
 
 
-import com.example.demo.entity.Blog;
+import com.example.demo.constant.BookConstant;
+import com.example.demo.entity.Book;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.elasticsearch.client.transport.TransportClient;
@@ -25,13 +26,13 @@ public class BookOthreController {
 
     @ApiOperation(value = "根据条件删除图书", notes = "根据条件删除图书")
     @PostMapping(value = "/delByTitleAndAut")
-    public ResponseEntity delByTitleAndAut(@RequestBody Blog blog) {
+    public ResponseEntity delByTitleAndAut(@RequestBody Book book) {
         try {
             BulkByScrollResponse response =
                     new DeleteByQueryRequestBuilder(client, DeleteByQueryAction.INSTANCE)
-                            .filter(QueryBuilders.matchQuery("title", blog.getTitle()))
-                            .filter(QueryBuilders.matchQuery("author", blog.getAuthro()))
-                            .source("book")
+                            .filter(QueryBuilders.matchQuery(BookConstant.title, book.getTitle()))
+                            .filter(QueryBuilders.matchQuery(BookConstant.authro, book.getAuthro()))
+                            .source(BookConstant.blogIndex)
                             .get();
             long deleted = response.getDeleted();
             return new ResponseEntity(deleted, HttpStatus.OK);
@@ -43,12 +44,12 @@ public class BookOthreController {
 
     @ApiOperation(value = "根据条件模糊匹配删除图书", notes = "根据条件模糊匹配删除图书")
     @PostMapping(value = "/delLikeByTitle")
-    public ResponseEntity delLikeByTitle(@RequestBody Blog blog) {
+    public ResponseEntity delLikeByTitle(@RequestBody Book book) {
         try {
             BulkByScrollResponse response =
                     new DeleteByQueryRequestBuilder(client, DeleteByQueryAction.INSTANCE)
-                            .filter(QueryBuilders.wildcardQuery("title", "*"+blog.getTitle()+"*"))
-                            .source("book")
+                            .filter(QueryBuilders.wildcardQuery(BookConstant.title, "*"+book.getTitle()+"*"))
+                            .source(BookConstant.blogIndex)
                             .get();
             long deleted = response.getDeleted();
             return new ResponseEntity(deleted, HttpStatus.OK);
@@ -60,14 +61,14 @@ public class BookOthreController {
 
     @ApiOperation(value = "根据条件匹配更新图书", notes = "根据条件匹配更新图书")
     @PostMapping(value = "/modifyByTitle")
-    public ResponseEntity modifyByTitle1(@RequestBody Blog blog) {
+    public ResponseEntity modifyByTitle1(@RequestBody Book book) {
         try {
             UpdateByQueryRequestBuilder updateByQueryRequestBuilder = UpdateByQueryAction.INSTANCE.newRequestBuilder(client);
-            updateByQueryRequestBuilder.source("book");
-            updateByQueryRequestBuilder.filter(QueryBuilders.termQuery("title", blog.getTitle()));
+            updateByQueryRequestBuilder.source(BookConstant.blogIndex);
+            updateByQueryRequestBuilder.filter(QueryBuilders.termQuery(BookConstant.title, book.getTitle()));
             updateByQueryRequestBuilder.script(
-                    new Script("ctx._source.author="+blog.getAuthro()
-                            +";ctx._source.word_count="+blog.getWordCount()
+                    new Script("ctx._source.author="+book.getAuthro()
+                            +";ctx._source.wordCount="+book.getWordCount()
                             +";"));
             long count =updateByQueryRequestBuilder.get().getUpdated();
             return new ResponseEntity(count, HttpStatus.OK);
@@ -79,14 +80,14 @@ public class BookOthreController {
 
     @ApiOperation(value = "根据条件模糊匹配更新图书", notes = "根据条件模糊匹配更新图书")
     @PostMapping(value = "/modifyLikeByTitle")
-    public ResponseEntity modifyLikeByTitle1(@RequestBody Blog blog) {
+    public ResponseEntity modifyLikeByTitle1(@RequestBody Book book) {
         try {
             UpdateByQueryRequestBuilder updateByQueryRequestBuilder = UpdateByQueryAction.INSTANCE.newRequestBuilder(client);
-            updateByQueryRequestBuilder.source("book");
-            updateByQueryRequestBuilder.filter(QueryBuilders.wildcardQuery("title", "*"+blog.getTitle()+"*"));
+            updateByQueryRequestBuilder.source(BookConstant.blogIndex);
+            updateByQueryRequestBuilder.filter(QueryBuilders.wildcardQuery(BookConstant.title, "*"+book.getTitle()+"*"));
             updateByQueryRequestBuilder.script(
-                    new Script("ctx._source.author="+blog.getAuthro()
-                            +";ctx._source.word_count="+blog.getWordCount()
+                    new Script("ctx._source.author="+book.getAuthro()
+                            +";ctx._source.wordCount="+book.getWordCount()
                             +";"));
             long count =updateByQueryRequestBuilder.get().getUpdated();
             return new ResponseEntity(count, HttpStatus.OK);

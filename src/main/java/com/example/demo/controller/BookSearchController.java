@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.constant.BookConstant;
 import com.example.demo.utils.DateLogUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,27 +45,27 @@ public class BookSearchController {
     {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (author != null){
-            boolQueryBuilder.must(QueryBuilders.matchQuery("author",author));
+            boolQueryBuilder.must(QueryBuilders.matchQuery(BookConstant.authro,author));
         }
 
         if (title != null){
-            boolQueryBuilder.must(QueryBuilders.wildcardQuery("title", "*"+title+"*"));
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(BookConstant.title, "*"+title+"*"));
         }
 
-        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("word_count").from(gtWordCount);
+        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(BookConstant.wordCount).from(gtWordCount);
         if (ltWordCount != null && ltWordCount > 0){
             rangeQueryBuilder.to(ltWordCount);
             boolQueryBuilder.filter(rangeQueryBuilder);
         }
 
 
-        SearchRequestBuilder searchRequestBuilder = client.prepareSearch("book")
-                .setTypes("novel")
+        SearchRequestBuilder searchRequestBuilder = client.prepareSearch(BookConstant.blogIndex)
+                .setTypes(BookConstant.blogTypeNoval)
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(boolQueryBuilder)
                 .setFrom(0)
                 .setSize(10)
-                .addSort("wordCount", SortOrder.DESC);
+                .addSort(BookConstant.wordCount, SortOrder.DESC);
         System.out.println(searchRequestBuilder); //调试用
         SearchResponse response = searchRequestBuilder.get();
         List<Map<String, Object>> result = new ArrayList<>();
@@ -88,24 +89,24 @@ public class BookSearchController {
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (author != null){
-            boolQueryBuilder.must(QueryBuilders.matchQuery("author",author));
+            boolQueryBuilder.must(QueryBuilders.matchQuery(BookConstant.authro,author));
         }
         if (title != null){
-            boolQueryBuilder.must(QueryBuilders.wildcardQuery("title", "*"+title+"*"));
+            boolQueryBuilder.must(QueryBuilders.wildcardQuery(BookConstant.title, "*"+title+"*"));
         }
 
-        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("word_count").from(gtWordCount);
+        RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery(BookConstant.wordCount).from(gtWordCount);
         if (ltWordCount != null && ltWordCount > 0){
             rangeQueryBuilder.to(ltWordCount);
             boolQueryBuilder.filter(rangeQueryBuilder);
         }
-        SearchRequestBuilder searchRequestBuilder = this.client.prepareSearch("book")
-                .setTypes("novel")
+        SearchRequestBuilder searchRequestBuilder = this.client.prepareSearch(BookConstant.blogIndex)
+                .setTypes(BookConstant.blogTypeNoval)
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(boolQueryBuilder)
                 .setFrom(0)
                 .setSize(10)
-                .addSort("publishDate", SortOrder.DESC);
+                .addSort(BookConstant.publishDate, SortOrder.DESC);
 
         SearchResponse response = searchRequestBuilder.get();
         List<Map<String, Object>> result = new ArrayList<>();
@@ -116,8 +117,8 @@ public class BookSearchController {
             result.add(map);
         }
 
-        long searchRequestBuilderTotal = this.client.prepareSearch("book")
-                .setTypes("novel")
+        long searchRequestBuilderTotal = this.client.prepareSearch(BookConstant.blogIndex)
+                .setTypes(BookConstant.blogTypeNoval)
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(boolQueryBuilder).get().getHits().getTotalHits();
         System.out.println("searchRequestBuilderTotal" + searchRequestBuilderTotal);
@@ -134,11 +135,11 @@ public class BookSearchController {
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
             if (title != null){
-                boolQueryBuilder.must(QueryBuilders.wildcardQuery("title", "*"+title+"*"));
+                boolQueryBuilder.must(QueryBuilders.wildcardQuery(BookConstant.title, "*"+title+"*"));
             }
 
-            SearchRequestBuilder search = client.prepareSearch("book2")
-                    .setTypes("novel")
+            SearchRequestBuilder search = client.prepareSearch(BookConstant.blogIndex)
+                    .setTypes(BookConstant.blogTypeNoval)
                     .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                     .setQuery(boolQueryBuilder);
 
@@ -151,8 +152,8 @@ public class BookSearchController {
 //            System.out.println(stats.getCount());
 
 //            SearchResponse sr =  search.addAggregation(AggregationBuilders.stats("typeEs_stats").field("typeEs.keyword")).execute().actionGet();
-            SearchResponse sr =  search.addAggregation(AggregationBuilders.terms("type_stats").field("typeEs.keyword")).execute().actionGet();
-            Terms terms = sr.getAggregations().get("type_stats");
+            SearchResponse sr =  search.addAggregation(AggregationBuilders.terms(BookConstant.blogType+"_stats").field(BookConstant.blogType+".keyword")).execute().actionGet();
+            Terms terms = sr.getAggregations().get(BookConstant.blogType+"_stats");
             for(int i=0;i<terms.getBuckets().size();i++){
                 //statistics
                 String id =terms.getBuckets().get(i).getKey().toString();//id
@@ -160,11 +161,6 @@ public class BookSearchController {
                 System.out.println("=="+terms.getBuckets().get(i).getDocCount()+"------"+terms.getBuckets().get(i).getKey());
             }
 
-//            System.out.println(stats.getAvgAsString());
-//            System.out.println(stats.getMaxAsString());
-//            System.out.println(stats.getMinAsString());
-//            System.out.println(stats.getSumAsString());
-//            System.out.println(stats.getCount());
 
             return new ResponseEntity(0, HttpStatus.OK);
         } catch (Exception e) {

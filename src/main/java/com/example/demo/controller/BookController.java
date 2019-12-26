@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 
 import com.example.demo.constant.BookConstant;
-import com.example.demo.entity.Blog;
 import com.example.demo.entity.Book;
 import com.example.demo.utils.DateLogUtils;
 import io.swagger.annotations.Api;
@@ -132,14 +131,14 @@ public class BookController {
     }
     @ApiOperation(value = "根据id更新图书", notes = "根据id更新图书")
     @PutMapping("/updatebyId")
-    public ResponseEntity updatebyId(@RequestBody Blog blog,@RequestParam(name = "id") String id){
+    public ResponseEntity updatebyId(@RequestBody Book book,@RequestParam(name = "id") String id){
         try {
             XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
-            if (blog.getTitle()!= null){
-                builder.field(BookConstant.title, blog.getTitle());
+            if (book.getTitle()!= null){
+                builder.field(BookConstant.title, book.getTitle());
             }
-            if (blog.getAuthro() != null){
-                builder.field(BookConstant.authro, blog.getAuthro());
+            if (book.getAuthro() != null){
+                builder.field(BookConstant.authro, book.getAuthro());
             }
             builder.endObject();
             UpdateRequest updateRequest = new UpdateRequest(BookConstant.blogIndex, BookConstant.blogTypeNoval, id);
