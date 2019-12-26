@@ -58,7 +58,6 @@ public class BookController {
     @ApiOperation(value = "根据测试数据批量添加书目", notes = "根据测试数据批量添加书目")
     @PostMapping(value = "/addBatch")
     public ResponseEntity addBatch() {
-
         String[] types = new String[4];
         types[0] = "TECHNOLOGY";
         types[1] = "HUMANITY";
