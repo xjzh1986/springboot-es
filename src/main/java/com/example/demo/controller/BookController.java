@@ -68,7 +68,7 @@ public class BookController {
             Date startDate = DateLogUtils.startDateLog();
             //批量添加
             int num = 0;
-            for(int i=0;i<10;i++){
+            for(int i=100;i<50000000;i++){
 
                 Book book = new Book();
                 book.setTitle("title"+i);
@@ -77,7 +77,7 @@ public class BookController {
                 book.setPublishDate(new Date());
                 book.setBlogType(types[num]);
                 book.setBlogOrder(num);
-                book.setContent("es技术学习");
+                book.setContent("ES技术学习");
                 book.setFrontImage("https://blog.csdn.net/jiahao1186/article/details/"+i);
 
 
