@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/blogOther")
-@Api(tags = "书目参数匹配模块")
+@Api(tags = "图书参数匹配模块")
 public class BookOthreController {
     @Autowired
     TransportClient client;
 
-    @ApiOperation(value = "根据条件删除书目", notes = "根据条件删除书目")
+    @ApiOperation(value = "根据条件删除图书", notes = "根据条件删除图书")
     @PostMapping(value = "/delByTitleAndAut")
     public ResponseEntity delByTitleAndAut(@RequestBody Blog blog) {
         try {
@@ -41,7 +41,7 @@ public class BookOthreController {
         }
     }
 
-    @ApiOperation(value = "根据条件模糊匹配删除书目", notes = "根据条件模糊匹配删除书目")
+    @ApiOperation(value = "根据条件模糊匹配删除图书", notes = "根据条件模糊匹配删除图书")
     @PostMapping(value = "/delLikeByTitle")
     public ResponseEntity delLikeByTitle(@RequestBody Blog blog) {
         try {
@@ -58,7 +58,7 @@ public class BookOthreController {
         }
     }
 
-    @ApiOperation(value = "根据条件匹配更新书目", notes = "根据条件匹配更新书目")
+    @ApiOperation(value = "根据条件匹配更新图书", notes = "根据条件匹配更新图书")
     @PostMapping(value = "/modifyByTitle")
     public ResponseEntity modifyByTitle1(@RequestBody Blog blog) {
         try {
@@ -77,7 +77,7 @@ public class BookOthreController {
         }
     }
 
-    @ApiOperation(value = "根据条件模糊匹配更新书目", notes = "根据条件模糊匹配更新书目")
+    @ApiOperation(value = "根据条件模糊匹配更新图书", notes = "根据条件模糊匹配更新图书")
     @PostMapping(value = "/modifyLikeByTitle")
     public ResponseEntity modifyLikeByTitle1(@RequestBody Blog blog) {
         try {

@@ -29,13 +29,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/blogSearch")
-@Api(tags = "书目查询模块")
+@Api(tags = "图书查询模块")
 public class BookSearchController {
 
     @Autowired
     TransportClient client;
 
-    @ApiOperation(value = "根据条件查询书目", notes = "根据条件查询书目")
+    @ApiOperation(value = "根据条件查询图书", notes = "根据条件查询图书")
     @PostMapping("/queryByParam")
     public ResponseEntity queryByParam(@RequestParam(name = "author", required = false) String author,
                                        @RequestParam(name = "title", required = false) String title,
@@ -77,7 +77,7 @@ public class BookSearchController {
         return  new ResponseEntity(result, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "根据条件分页查询书目", notes = "根据条件分页查询书目")
+    @ApiOperation(value = "根据条件分页查询图书", notes = "根据条件分页查询图书")
     @PostMapping("/queryPageByParam")
     public ResponseEntity queryPageByParam(@RequestParam(name = "author", required = false) String author,
                                            @RequestParam(name = "title", required = false) String title,

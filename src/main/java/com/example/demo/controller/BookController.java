@@ -22,16 +22,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/blog")
-@Api(tags = "书目模块")
+@Api(tags = "图书基本操作模块")
 public class BookController {
     @Autowired
     TransportClient client;
 
-    @ApiOperation(value = "根据参数添加书目", notes = "根据参数添加书目")
+    @ApiOperation(value = "根据参数添加图书", notes = "根据参数添加图书")
     @PostMapping(value = "/add")
     public ResponseEntity add(@RequestBody Book book) {
         Date startDate = DateLogUtils.startDateLog();
@@ -42,7 +41,7 @@ public class BookController {
                     .field(BookConstant.authro, book.getAuthro())
 //                    .field(BookConstant.wordCount, (int)(Math.random()*(9999-1000+1)+1000))
                     .field(BookConstant.wordCount, book.getWordCount())
-                    .field(BookConstant.publishDate, book.getPublishDate())
+                    .field(BookConstant.publishDate, book.getPublishDate().getTime())
                     .field(BookConstant.blogType, book.getBlogType())
                     .field(BookConstant.blogOrder, book.getBlogOrder())
                     .field(BookConstant.content, book.getContent())
@@ -57,7 +56,7 @@ public class BookController {
         }
     }
 
-    @ApiOperation(value = "根据测试数据批量添加书目", notes = "根据测试数据批量添加书目")
+    @ApiOperation(value = "根据测试数据批量添加图书", notes = "根据测试数据批量添加图书")
     @PostMapping(value = "/addBatch")
     public ResponseEntity addBatch() {
         String[] types = new String[4];
@@ -71,23 +70,31 @@ public class BookController {
             //批量添加
             int num = 0;
             for(int i=0;i<10;i++){
-                String code = UUID.randomUUID().toString().replace("-","");
+
+                Book book = new Book();
+                book.setTitle("title"+i);
+                book.setAuthro("authro"+i);
+                book.setWordCount((int)(Math.random()*(9999-1000+1)+1000));
+                book.setPublishDate(new Date());
+                book.setBlogType(types[num]);
+                book.setBlogOrder(num);
+                book.setContent("es技术学习");
+                book.setFrontImage("https://blog.csdn.net/jiahao1186/article/details/"+i);
+
+
                 XContentBuilder content = XContentFactory.jsonBuilder().startObject()
-                        .field("title", "title"+i)
-                        .field("author", "author"+i)
-                        .field("wordCount", (int)(Math.random()*(9999-1000+1)+1000))
-                        .field("publishDate", new Date().getTime())
-                        .field("createDate", new Date().getTime())
-                        .field("updateDate", new Date().getTime())
-                        .field("createCode", code)
-                        .field("updateCode", code)
-                        .field("content", "经常在添加数据到数据库中使用")
-                        .field("frontImage", "https://blog.csdn.net/zhengyikuangge/article/details/"+i)
-                        .field("typeEs", types[num])
+                        .field(BookConstant.title, book.getTitle())
+                        .field(BookConstant.authro, book.getAuthro())
+                        .field(BookConstant.wordCount, book.getWordCount())
+                        .field(BookConstant.publishDate, book.getPublishDate().getTime())
+                        .field(BookConstant.blogType, book.getBlogType())
+                        .field(BookConstant.blogOrder, book.getBlogOrder())
+                        .field(BookConstant.content, book.getContent())
+                        .field(BookConstant.frontImage, book.getFrontImage())
                         .endObject();
                 System.out.println("成功插入 第 " + i + " 条");
-                result = this.client.prepareIndex("book2", "novel").setSource(content).get();
-                if(num < 2){
+                result = this.client.prepareIndex(BookConstant.blogIndex, BookConstant.blogTypeNoval).setSource(content).get();
+                if(num < 3){
                     num++;
                 }else{
                     num = 0;
@@ -102,40 +109,40 @@ public class BookController {
         }
     }
 
-    @ApiOperation(value = "根据id删除书目", notes = "根据id删除书目")
+    @ApiOperation(value = "根据id删除图书", notes = "根据id删除图书")
     @DeleteMapping(value = "/deleteById")
     public ResponseEntity deleteById(@RequestParam(name = "id") String id)
     {
-        DeleteResponse result = client.prepareDelete("book", "novel", id).get();
+        DeleteResponse result = client.prepareDelete(BookConstant.blogIndex, BookConstant.blogTypeNoval, id).get();
         return new ResponseEntity(result.getResult().toString(), HttpStatus.OK);
     }
 
-    @ApiOperation(value = "根据id查找书目", notes = "根据id查找书目")
+    @ApiOperation(value = "根据id查找图书", notes = "根据id查找图书")
     @GetMapping(value = "/getById")
     public ResponseEntity getById(@RequestParam(name = "id", defaultValue="") String id)
     {
         if (id.isEmpty()){
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
-        GetResponse result = this.client.prepareGet("book", "novel", id).get();
+        GetResponse result = this.client.prepareGet(BookConstant.blogIndex, BookConstant.blogTypeNoval, id).get();
         if (!result.isExists()){
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity(result.getSource(), HttpStatus.OK);
     }
-    @ApiOperation(value = "根据id更新书目", notes = "根据id更新书目")
+    @ApiOperation(value = "根据id更新图书", notes = "根据id更新图书")
     @PutMapping("/updatebyId")
     public ResponseEntity updatebyId(@RequestBody Blog blog,@RequestParam(name = "id") String id){
         try {
             XContentBuilder builder = XContentFactory.jsonBuilder().startObject();
             if (blog.getTitle()!= null){
-                builder.field("title", blog.getTitle());
+                builder.field(BookConstant.title, blog.getTitle());
             }
             if (blog.getAuthro() != null){
-                builder.field("author", blog.getAuthro());
+                builder.field(BookConstant.authro, blog.getAuthro());
             }
             builder.endObject();
-            UpdateRequest updateRequest = new UpdateRequest("book", "novel", id);
+            UpdateRequest updateRequest = new UpdateRequest(BookConstant.blogIndex, BookConstant.blogTypeNoval, id);
             updateRequest.doc(builder);
 
             UpdateResponse result = client.update(updateRequest).get();
