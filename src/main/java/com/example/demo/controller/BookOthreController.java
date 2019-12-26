@@ -24,6 +24,29 @@ public class BookOthreController {
     @Autowired
     TransportClient client;
 
+    @ApiOperation(value = "根据条件删除图书Other", notes = "根据条件删除图书Other")
+    @PostMapping(value = "/delByTitleAndAutOther")
+    public ResponseEntity delByTitleAndAutOther(@RequestBody Book book) {
+        try {
+            DeleteByQueryRequestBuilder deleteByQueryRequestBuilder = new DeleteByQueryRequestBuilder(client, DeleteByQueryAction.INSTANCE);
+            deleteByQueryRequestBuilder.filter(QueryBuilders.matchQuery(BookConstant.title, book.getTitle()));
+            deleteByQueryRequestBuilder.filter(QueryBuilders.matchQuery(BookConstant.authro, book.getAuthro()));
+            BulkByScrollResponse response = deleteByQueryRequestBuilder.source(BookConstant.blogIndex).get();
+
+//            BulkByScrollResponse response =
+//                    new DeleteByQueryRequestBuilder(client, DeleteByQueryAction.INSTANCE)
+//                            .filter(QueryBuilders.matchQuery(BookConstant.title, book.getTitle()))
+//                            .filter(QueryBuilders.matchQuery(BookConstant.authro, book.getAuthro()))
+//                            .source(BookConstant.blogIndex)
+//                            .get();
+            long deleted = response.getDeleted();
+            return new ResponseEntity(deleted, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @ApiOperation(value = "根据条件删除图书", notes = "根据条件删除图书")
     @PostMapping(value = "/delByTitleAndAut")
     public ResponseEntity delByTitleAndAut(@RequestBody Book book) {
