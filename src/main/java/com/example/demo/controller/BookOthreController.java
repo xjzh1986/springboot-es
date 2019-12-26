@@ -91,6 +91,7 @@ public class BookOthreController {
                             +";"));
             long count =updateByQueryRequestBuilder.get().getUpdated();
             return new ResponseEntity(count, HttpStatus.OK);
+
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
