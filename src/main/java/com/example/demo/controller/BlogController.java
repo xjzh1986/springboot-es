@@ -55,7 +55,7 @@ public class BlogController {
             Date startDate = DateLogUtils.startDateLog();
             //批量添加
             int num = 0;
-            for(int i=0;i<50000000;i++){
+            for(int i=0;i<10;i++){
 
                 if(num < 2){
                     num++;
@@ -75,10 +75,10 @@ public class BlogController {
                         .field("updateCode", code)
                         .field("content", "经常在添加数据到数据库中使用")
                         .field("frontImage", "https://blog.csdn.net/zhengyikuangge/article/details/"+i)
-                        .field("type", types[num])
+                        .field("typeEs", types[num])
                         .endObject();
                 System.out.println("成功插入 第 " + i + " 条");
-                result = this.client.prepareIndex("book", "novel").setSource(content).get();
+                result = this.client.prepareIndex("book2", "novel").setSource(content).get();
             }
 //            XContentBuilder content = XContentFactory.jsonBuilder().startObject()
 //                    .field("title", blog.getTitle())

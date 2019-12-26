@@ -12,7 +12,10 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,19 +141,34 @@ public class BlogSearchController {
                 boolQueryBuilder.must(QueryBuilders.wildcardQuery("title", "*"+title+"*"));
             }
 
-            SearchRequestBuilder search = client.prepareSearch("book")
+            SearchRequestBuilder search = client.prepareSearch("book2")
                     .setTypes("novel")
                     .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                     .setQuery(boolQueryBuilder);
 
-            SearchResponse sr =  search.addAggregation(AggregationBuilders.stats("wordCount_stats").field("wordCount")).execute().actionGet();
+//            SearchResponse sr =  search.addAggregation(AggregationBuilders.stats("wordCount_stats").field("wordCount")).execute().actionGet();
+//            Stats stats = sr.getAggregations().get("wordCount_stats");
+//            System.out.println(stats.getAvgAsString());
+//            System.out.println(stats.getMaxAsString());
+//            System.out.println(stats.getMinAsString());
+//            System.out.println(stats.getSumAsString());
+//            System.out.println(stats.getCount());
 
-            Stats stats = sr.getAggregations().get("wordCount_stats");
-            System.out.println(stats.getAvgAsString());
-            System.out.println(stats.getMaxAsString());
-            System.out.println(stats.getMinAsString());
-            System.out.println(stats.getSumAsString());
-            System.out.println(stats.getCount());
+//            SearchResponse sr =  search.addAggregation(AggregationBuilders.stats("typeEs_stats").field("typeEs.keyword")).execute().actionGet();
+            SearchResponse sr =  search.addAggregation(AggregationBuilders.terms("type_stats").field("typeEs.keyword")).execute().actionGet();
+            Terms terms = sr.getAggregations().get("type_stats");
+            for(int i=0;i<terms.getBuckets().size();i++){
+                //statistics
+                String id =terms.getBuckets().get(i).getKey().toString();//id
+                Long sum =terms.getBuckets().get(i).getDocCount();//数量
+                System.out.println("=="+terms.getBuckets().get(i).getDocCount()+"------"+terms.getBuckets().get(i).getKey());
+            }
+
+//            System.out.println(stats.getAvgAsString());
+//            System.out.println(stats.getMaxAsString());
+//            System.out.println(stats.getMinAsString());
+//            System.out.println(stats.getSumAsString());
+//            System.out.println(stats.getCount());
 
             return new ResponseEntity(0, HttpStatus.OK);
         } catch (Exception e) {
