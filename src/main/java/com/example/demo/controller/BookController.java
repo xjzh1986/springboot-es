@@ -26,7 +26,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(value = "/blog")
 @Api(tags = "书目模块")
-public class BlogController {
+public class BookController {
     @Autowired
     TransportClient client;
 

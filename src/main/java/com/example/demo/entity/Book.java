@@ -3,11 +3,9 @@ package com.example.demo.entity;
 import com.example.demo.utils.ReflexUtils;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Date;
 
-public class Blog implements Serializable {
+public class Book implements Serializable {
     /**
      * 标题
      */
@@ -108,7 +106,7 @@ public class Blog implements Serializable {
 
     public static void main(String[] args) {
 
-        Blog blog = new Blog();
+        Book blog = new Book();
         blog.setTitle("111");
         blog.setAuthro("222");
         blog.setBlogOrder(2);
