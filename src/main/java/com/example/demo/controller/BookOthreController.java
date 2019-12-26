@@ -67,7 +67,7 @@ public class BookOthreController {
             updateByQueryRequestBuilder.source(BookConstant.blogIndex);
             updateByQueryRequestBuilder.filter(QueryBuilders.termQuery(BookConstant.title, book.getTitle()));
             updateByQueryRequestBuilder.script(
-                    new Script("ctx._source.author="+book.getAuthro()
+                    new Script("ctx._source.authro="+book.getAuthro()
                             +";ctx._source.wordCount="+book.getWordCount()
                             +";"));
             long count =updateByQueryRequestBuilder.get().getUpdated();
@@ -86,7 +86,7 @@ public class BookOthreController {
             updateByQueryRequestBuilder.source(BookConstant.blogIndex);
             updateByQueryRequestBuilder.filter(QueryBuilders.wildcardQuery(BookConstant.title, "*"+book.getTitle()+"*"));
             updateByQueryRequestBuilder.script(
-                    new Script("ctx._source.author="+book.getAuthro()
+                    new Script("ctx._source.authro="+book.getAuthro()
                             +";ctx._source.wordCount="+book.getWordCount()
                             +";"));
             long count =updateByQueryRequestBuilder.get().getUpdated();
