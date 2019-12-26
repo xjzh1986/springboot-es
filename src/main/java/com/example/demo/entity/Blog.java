@@ -4,28 +4,38 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class Blog implements Serializable {
-
+    /**
+     *  标题
+     */
     private String title;
-
+    /**
+     * 内容
+     */
     private String content;
-
+    /**
+     * 封面
+     */
     private String frontImage;
-
+    /**
+     * 作者
+     */
     private String authro;
-
-    private int wordCount;
-
+    /**
+     * 词量
+     */
+    private Integer wordCount;
+    /**
+     * 发布时间
+     */
     private Date publishDate;
-
-    private Date createDate;
-
-    private String createCode;
-
-    private Date updateDate;
-
-    private String updateCode;
-
-    private String type;
+    /**
+     * 类别
+     */
+    private String blogType;
+    /**
+     * 排序
+     */
+    private Integer blogOrder;
 
 
     public String getTitle() {
@@ -34,30 +44,6 @@ public class Blog implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getAuthro() {
-        return authro;
-    }
-
-    public void setAuthro(String authro) {
-        this.authro = authro;
-    }
-
-    public int getWordCount() {
-        return wordCount;
-    }
-
-    public void setWordCount(int wordCount) {
-        this.wordCount = wordCount;
-    }
-
-    public Date getPublishDate() {
-        return publishDate;
-    }
-
-    public void setPublishDate(Date publishDate) {
-        this.publishDate = publishDate;
     }
 
     public String getContent() {
@@ -76,43 +62,43 @@ public class Blog implements Serializable {
         this.frontImage = frontImage;
     }
 
-    public Date getCreateDate() {
-        return createDate;
+    public String getAuthro() {
+        return authro;
     }
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setAuthro(String authro) {
+        this.authro = authro;
     }
 
-    public String getCreateCode() {
-        return createCode;
+    public Integer getWordCount() {
+        return wordCount;
     }
 
-    public void setCreateCode(String createCode) {
-        this.createCode = createCode;
+    public void setWordCount(Integer wordCount) {
+        this.wordCount = wordCount;
     }
 
-    public Date getUpdateDate() {
-        return updateDate;
+    public Date getPublishDate() {
+        return publishDate;
     }
 
-    public void setUpdateDate(Date updateDate) {
-        this.updateDate = updateDate;
+    public void setPublishDate(Date publishDate) {
+        this.publishDate = publishDate;
     }
 
-    public String getUpdateCode() {
-        return updateCode;
+    public String getBlogType() {
+        return blogType;
     }
 
-    public void setUpdateCode(String updateCode) {
-        this.updateCode = updateCode;
+    public void setBlogType(String blogType) {
+        this.blogType = blogType;
     }
 
-    public String getType() {
-        return type;
+    public Integer getBlogOrder() {
+        return blogOrder;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setBlogOrder(Integer blogOrder) {
+        this.blogOrder = blogOrder;
     }
 }
