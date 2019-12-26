@@ -14,6 +14,7 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -143,22 +144,46 @@ public class BookSearchController {
                     .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                     .setQuery(boolQueryBuilder);
 
-//            SearchResponse sr =  search.addAggregation(AggregationBuilders.stats("wordCount_stats").field("wordCount")).execute().actionGet();
-//            Stats stats = sr.getAggregations().get("wordCount_stats");
-//            System.out.println(stats.getAvgAsString());
-//            System.out.println(stats.getMaxAsString());
-//            System.out.println(stats.getMinAsString());
-//            System.out.println(stats.getSumAsString());
-//            System.out.println(stats.getCount());
+            SearchResponse sr =  search.addAggregation(AggregationBuilders.stats("wordCount_stats").field("wordCount")).execute().actionGet();
+            Stats stats = sr.getAggregations().get("wordCount_stats");
+            System.out.println(stats.getAvgAsString());
+            System.out.println(stats.getMaxAsString());
+            System.out.println(stats.getMinAsString());
+            System.out.println(stats.getSumAsString());
+            System.out.println(stats.getCount());
 
-//            SearchResponse sr =  search.addAggregation(AggregationBuilders.stats("typeEs_stats").field("typeEs.keyword")).execute().actionGet();
+
+            return new ResponseEntity(0, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @ApiOperation(value = "根据条件分组查询", notes = "根据条件分组查询")
+    @PostMapping(value = "/queryGroupOpt")
+    public ResponseEntity queryGroupOpt(
+            @RequestParam(name = "title", required = false) String title) {
+        try {
+            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+            if (title != null){
+                boolQueryBuilder.must(QueryBuilders.wildcardQuery(BookConstant.title, "*"+title+"*"));
+            }
+
+            SearchRequestBuilder search = client.prepareSearch(BookConstant.blogIndex)
+                    .setTypes(BookConstant.blogTypeNoval)
+                    .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+                    .setQuery(boolQueryBuilder);
+
             SearchResponse sr =  search.addAggregation(AggregationBuilders.terms(BookConstant.blogType+"_stats").field(BookConstant.blogType+".keyword")).execute().actionGet();
             Terms terms = sr.getAggregations().get(BookConstant.blogType+"_stats");
             for(int i=0;i<terms.getBuckets().size();i++){
-                //statistics
+
                 String id =terms.getBuckets().get(i).getKey().toString();//id
                 Long sum =terms.getBuckets().get(i).getDocCount();//数量
                 System.out.println("=="+terms.getBuckets().get(i).getDocCount()+"------"+terms.getBuckets().get(i).getKey());
+
             }
 
 
@@ -168,4 +193,7 @@ public class BookSearchController {
             return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+
 }
