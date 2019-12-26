@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 
+import com.example.demo.constant.BookConstant;
 import com.example.demo.entity.Blog;
 import com.example.demo.entity.Book;
 import com.example.demo.utils.DateLogUtils;
@@ -37,16 +38,17 @@ public class BookController {
         try {
             IndexResponse result = null;
             XContentBuilder content = XContentFactory.jsonBuilder().startObject()
-                    .field("title", "title")
-                    .field("author", "author")
-                    .field("wordCount", (int)(Math.random()*(9999-1000+1)+1000))
-                    .field("publishDate", new Date().getTime())
-                    .field("createDate", new Date().getTime())
-                    .field("updateDate", new Date().getTime())
-                    .field("content", "经常在添加数据到数据库中使用")
-                    .field("frontImage", "https://blog.csdn.net/zhengyikuangge/article/details/")
+                    .field(BookConstant.title, book.getTitle())
+                    .field(BookConstant.authro, book.getAuthro())
+//                    .field(BookConstant.wordCount, (int)(Math.random()*(9999-1000+1)+1000))
+                    .field(BookConstant.wordCount, book.getWordCount())
+                    .field(BookConstant.publishDate, book.getPublishDate())
+                    .field(BookConstant.blogType, book.getBlogType())
+                    .field(BookConstant.blogOrder, book.getBlogOrder())
+                    .field(BookConstant.content, book.getContent())
+                    .field(BookConstant.frontImage, book.getFrontImage())
                     .endObject();
-            result = this.client.prepareIndex("book2", "novel").setSource(content).get();
+            result = this.client.prepareIndex(BookConstant.blogIndex, BookConstant.blogTypeNoval).setSource(content).get();
             DateLogUtils.endDateLog(startDate);
             return new ResponseEntity(result.getId(), HttpStatus.OK);
         } catch (IOException e) {
