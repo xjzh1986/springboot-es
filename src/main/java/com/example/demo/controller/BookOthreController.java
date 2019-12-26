@@ -61,7 +61,7 @@ public class BookOthreController {
 
     @ApiOperation(value = "根据条件匹配更新图书", notes = "根据条件匹配更新图书")
     @PostMapping(value = "/modifyByTitle")
-    public ResponseEntity modifyByTitle1(@RequestBody Book book) {
+    public ResponseEntity modifyByTitle(@RequestBody Book book) {
         try {
             UpdateByQueryRequestBuilder updateByQueryRequestBuilder = UpdateByQueryAction.INSTANCE.newRequestBuilder(client);
             updateByQueryRequestBuilder.source(BookConstant.blogIndex);
@@ -80,7 +80,7 @@ public class BookOthreController {
 
     @ApiOperation(value = "根据条件模糊匹配更新图书", notes = "根据条件模糊匹配更新图书")
     @PostMapping(value = "/modifyLikeByTitle")
-    public ResponseEntity modifyLikeByTitle1(@RequestBody Book book) {
+    public ResponseEntity modifyLikeByTitle(@RequestBody Book book) {
         try {
             UpdateByQueryRequestBuilder updateByQueryRequestBuilder = UpdateByQueryAction.INSTANCE.newRequestBuilder(client);
             updateByQueryRequestBuilder.source(BookConstant.blogIndex);
@@ -89,6 +89,24 @@ public class BookOthreController {
                     new Script("ctx._source.authro="+book.getAuthro()
                             +";ctx._source.wordCount="+book.getWordCount()
                             +";"));
+            long count =updateByQueryRequestBuilder.get().getUpdated();
+            return new ResponseEntity(count, HttpStatus.OK);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @ApiOperation(value = "根据条件模糊匹配删除field", notes = "根据条件模糊匹配删除field")
+    @PostMapping(value = "/delFieldLikeByTitle")
+    public ResponseEntity delFieldLikeByTitle(@RequestBody Book book) {
+        try {
+            UpdateByQueryRequestBuilder updateByQueryRequestBuilder = UpdateByQueryAction.INSTANCE.newRequestBuilder(client);
+            updateByQueryRequestBuilder.source(BookConstant.blogIndex);
+            updateByQueryRequestBuilder.filter(QueryBuilders.wildcardQuery(BookConstant.title, "*"+book.getTitle()+"*"));
+            updateByQueryRequestBuilder.script(
+                    new Script("ctx._source.remove(\"author\");"));
             long count =updateByQueryRequestBuilder.get().getUpdated();
             return new ResponseEntity(count, HttpStatus.OK);
 
