@@ -9,6 +9,8 @@ public class SpringbootEsApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SpringbootEsApplication.class, args);
 		System.out.println("Success");
+
+
 	}
 
 }
