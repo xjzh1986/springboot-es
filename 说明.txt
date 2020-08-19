@@ -18,3 +18,5 @@ IK分词器
 https://blog.csdn.net/weixin_45140326/article/details/98185314
 https://www.cnblogs.com/miao11/p/13299445.html
 
+Docker 安装 Kibana
+https://www.cnblogs.com/linjiqin/p/12103064.html
