@@ -1,11 +1,11 @@
-ES ѧϰ
-SpringBoot����Elasticsearch��ʵ��CRUD����
+ES 说明
+SpringBoot整合Elasticsearch并实现CRUD操作
 https://blog.csdn.net/zxc123e/article/details/79498113
 
-SpringBoot����ElasticSearch
+SpringBoot集成ElasticSearch
 https://www.jianshu.com/p/6887faf6b479
 
-docker���״ElasticSearch��Ⱥ
+docker简易搭建ElasticSearch集群
 https://blog.csdn.net/belonghuang157405/article/details/83301937
 
 docker - kibana + elasticsearch + ik 分词的集群搭建
@@ -14,6 +14,7 @@ https://blog.csdn.net/weixin_41406041/article/details/100662315
 Java API
 https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/index.html
 
-IK�ִ�
+IK分词器
 https://blog.csdn.net/weixin_45140326/article/details/98185314
 https://www.cnblogs.com/miao11/p/13299445.html
+
